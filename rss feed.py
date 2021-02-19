@@ -1,3 +1,10 @@
+#Go to https://takeout.google.com/takeout/custom/youtube 
+#Click on 'All data included' then on 'Deselect all' then only 'Subscriptions' & click 'OK'
+#Click 'Next step' & then on 'Create export'
+#Click the 'Download' button after it appears
+#Then extract the .json file from the downloaded zip file and get the file in the same folder as the script
+#Run the script
+
 import os,time
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
@@ -6,15 +13,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
-#Opens target file and splits all the urls
-#Go to https://www.youtube.com/subscription_manager and get the file
-#Go to https://www.rssmix.com 
-file = "/mnt/6708B5D108FCE57A/Downloads/subscription_manager"
+import json
+
+file = 'subscriptions.json'
 readfile = open(file, "r",encoding="utf8")
 
 def rssmix(results,number):
     options = Options()
-    options.headless = False #Set to false if needed to actually see steps being performed
+    options.headless = True #Set to false if needed to actually see steps being performed
     driver = webdriver.Firefox(options=options)
     driver.get("https://www.rssmix.com")
     for result in results:
@@ -30,8 +36,8 @@ def rssmix(results,number):
         driver.close()
         return link
     except TimeoutException:
+        driver.close()
         print ("Loading took too much time!")
-
 
 target = readfile.read()
 i = 1
@@ -39,11 +45,12 @@ y = 1
 results = []
 while True:
     try:
-        target = target.split('xmlUrl="',1)
-        result = target[1].split('" />',1)[0]
+        target = target.split('''"resourceId" : {
+      "channelId" : "''',1)
+        result ="https://www.youtube.com/feeds/videos.xml?channel_id=" + target[1].split('",',1)[0]
         #print (result)
         results.append(result)
-        target = target[1].split('" />',1)[1]
+        target = target[1].split('",',1)[1]
         i += 1
         if i>99:
             rss = rssmix(results,y)

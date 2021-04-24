@@ -15,8 +15,8 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 import json
 
-file = 'subscriptions.json'
-readfile = open(file, "r",encoding="utf8")
+with open("subscriptions.json", "r", encoding="utf8") as read_file:
+    data = json.load(read_file)
 
 def rssmix(results,number):
     options = Options()
@@ -39,29 +39,23 @@ def rssmix(results,number):
         driver.close()
         print ("Loading took too much time!")
 
-target = readfile.read()
+
 i = 1
 y = 1
 results = []
-while True:
-    try:
-        target = target.split('''"resourceId" : {
-      "channelId" : "''',1)
-        result ="https://www.youtube.com/feeds/videos.xml?channel_id=" + target[1].split('",',1)[0]
-        #print (result)
-        results.append(result)
-        target = target[1].split('",',1)[1]
-        i += 1
-        if i>99:
-            rss = rssmix(results,y)
-            i = 1
-            results = []
-            print ("Part "+ str(y) + " ################################################################################################### " + "Part "+ str(y))
-            print (rss)
-            y += 1
-    except:
-        rss = rssmix(results,y)
-        print ("Part "+ str(y) + " ################################################################################################### " + "Part "+ str(y))
-        print (rss)
-        print ("done,I guess")
-        break
+
+#add all channel links to one list
+for element in data:
+    results.append("https://www.youtube.com/feeds/videos.xml?channel_id=" + element['snippet']['resourceId']['channelId'])
+
+import collections
+print(len([item for item, count in collections.Counter(results).items() if count > 1]))
+#split this list in lists of 99 items
+composite = [results[x:x+98] for x in range(0, len(results),98)]
+
+for list in composite:
+    rss = rssmix(list,y)
+    print ("Part "+ str(y) + " ################################################################################################### " + "Part "+ str(y))
+    print (rss)
+    y += 1
+print ("done,I guess")

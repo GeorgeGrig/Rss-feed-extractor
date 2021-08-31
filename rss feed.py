@@ -14,13 +14,12 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
 import json
+import csv
 
-with open("subscriptions.json", "r", encoding="utf8") as read_file:
-    data = json.load(read_file)
 
 def rssmix(results,number):
     options = Options()
-    options.headless = True #Set to false if needed to actually see steps being performed
+    options.headless = False #Set to false if needed to actually see steps being performed
     driver = webdriver.Firefox(options=options)
     driver.get("https://www.rssmix.com")
     for result in results:
@@ -39,18 +38,41 @@ def rssmix(results,number):
         driver.close()
         print ("Loading took too much time!")
 
+# JSON - legacy way? idk any more
+# with open("subscriptions.json", "r", encoding="utf8") as read_file:
+#     data = json.load(read_file)
+# i = 1
+# y = 1
+# results = []
 
-i = 1
-y = 1
-results = []
+# #add all channel links to one list
+# for element in data:
+#     results.append("https://www.youtube.com/feeds/videos.xml?channel_id=" + element['snippet']['resourceId']['channelId'])
 
-#add all channel links to one list
-for element in data:
-    results.append("https://www.youtube.com/feeds/videos.xml?channel_id=" + element['snippet']['resourceId']['channelId'])
-
-import collections
-print(len([item for item, count in collections.Counter(results).items() if count > 1]))
+# import collections
+# print(len([item for item, count in collections.Counter(results).items() if count > 1]))
+# print(len(results))
 #split this list in lists of 99 items
+
+
+# csv
+results = []
+y = 1
+with open('subscriptions.csv') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    line_count = 0
+    try:
+        for row in csv_reader:
+            if line_count == 0:
+                line_count += 1
+            else:
+                results.append("https://www.youtube.com/feeds/videos.xml?channel_id=" + str({row[0]}).replace("'", '').replace("{", '').replace("}", ''))
+                line_count += 1
+    except:
+        print(results)
+        print(len(results))
+
+
 composite = [results[x:x+98] for x in range(0, len(results),98)]
 
 for list in composite:

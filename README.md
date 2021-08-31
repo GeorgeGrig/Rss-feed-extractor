@@ -6,6 +6,4 @@ Turn 100 rss feeds into 1 with the help of [rss mix](http://rssmix.com/).
 Some rss feed readers allow for a maximum of 100 subscriptions if you don't pay.  
 Considering that I have more than 100 Youtube subscriptions and I hate paying when I can avoid it this script was a simple decision.  
 ## Getting started  
-* In order to run the script you need to install all the required prerequisites.   
-* Go to https://www.youtube.com/subscription_manager and grab the file.  
-* Change the 'file' variable to point to 'subscription_manager' file.
+ Read in-script guide
